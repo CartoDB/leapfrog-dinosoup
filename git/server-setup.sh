@@ -1,3 +1,4 @@
+sudo apt-get install git
 git add git
 mkdir /srv/git/myapp.git
 chown -R /srv/git
