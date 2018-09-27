@@ -35,10 +35,12 @@ def hello_world():
     return 'Hello, World!'
 
 @app.route('/<username>/apps/<string:app_name>/deploy', methods=['POST'])
-def show_deploy(app_name):
+def push_deploy(app_name):
     status = request.form['status']
     deploy = Deploy(app_name, status)
+    import pdb; pdb.set_trace()
 
 
 @app.route('/<username>/deploys/<int:deploy_id>', methods=['GET'])
 def show_deploy(deploy_id):
+    pass
