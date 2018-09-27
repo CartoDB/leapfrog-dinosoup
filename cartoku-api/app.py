@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.dialects.postgresql import JSON
@@ -37,9 +37,12 @@ def hello_world():
 
 @app.route('/<username>/apps/<string:app_name>/deploy', methods=['POST'])
 def push_deploy(username, app_name):
-    status = requests.form['status']
+#    import pdb; pdb.set_trace()
+    status = request.form['status']
     deploy = Deploy(app_name, status)
-    import pdb; pdb.set_trace()
+    return jsonify(
+                {'status': 'ok'}
+            )
 
 
 @app.route('/<username>/deploys/<int:deploy_id>', methods=['GET'])
