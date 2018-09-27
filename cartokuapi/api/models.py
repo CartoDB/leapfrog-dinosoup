@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 import logging
 
@@ -13,6 +14,7 @@ class Deploy(models.Model):
     app = models.ForeignKey(App, on_delete=models.CASCADE)
     status = models.CharField(max_length=30)
     log = models.TextField(default='')
+    created_at = models.DateTimeField(default=timezone.now) 
     _logger = None
 
     def logger(self):

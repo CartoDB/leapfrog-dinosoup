@@ -19,6 +19,7 @@ from api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(r'<str:username>/deploys/<int:deploy_id>', views.push_deploy),
+    path(r'<username>/apps/<app_name>/deploy', views.push_deploy),
     path(r'<username>/apps/<app_name>/deploys', views.list_deploys)
 ]
+    #path(r'<str:username>/deploys/<int:deploy_id>', views.show_deploy),
