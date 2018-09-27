@@ -49,7 +49,8 @@ def run_command(command, logger, cwd=None):
     """
 
     logger.info(command)
-    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=cwd)
+    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT, cwd=cwd)
     while p.poll() is None:
         line = p.stdout.readline()
         logger.debug(line)
@@ -90,7 +91,6 @@ class Deployer:
         # Run install
         self.logger.info("Installing node dependencies")
         rc = run_command(f"{node_cmd} {manager} install", self.logger)
-
 
         if rc != 0:
             self.logger.error("Failed to install node dependencies")
