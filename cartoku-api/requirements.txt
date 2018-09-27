@@ -1,7 +1,0 @@
-Flask
-SQLAlchemy
-sqlalchemy-migrate
-Flask-Migrate
-psycopg2
-Flask-SQLAlchemy
-requests
