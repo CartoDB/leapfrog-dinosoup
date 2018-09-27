@@ -1,0 +1,19 @@
+@locationred: #F24440;
+
+html, body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#content {
+    display: block;
+    height: 100%;
+    text-align: center;
+    pading-top: 50px;
+    background-color: @locationred;
+
+    &:hover{
+        background-color: fadeout(@locationred, 50%)
+    }
+}

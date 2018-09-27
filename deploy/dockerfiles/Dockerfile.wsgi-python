@@ -1,0 +1,14 @@
+FROM alpine:3.8
+
+COPY . .
+
+RUN apk add --no-cache python3 uwsgi-python3
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+CMD ["uwsgi", "--socket", "0.0.0.0:8080", \
+    "--uid", "uwsgi", \
+    "--plugins", "python3", \
+    "--protocol", "http", \
+    "--check-static", "static", \
+    "--wsgi", "main:app"]

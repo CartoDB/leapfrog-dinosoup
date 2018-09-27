@@ -1,0 +1,10 @@
+{
+  "name": "dummy-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "lessc assets/style.less static/style.css"
+  },
+  "dependencies": {
+    "less": "^3.8.1"
+  }
+}
