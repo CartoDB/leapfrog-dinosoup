@@ -6,19 +6,12 @@ from api.tasks import deploy
 
 #@csrf_exempt
 def push_deploy(request, username, app_name):
-    status = request.POST['status']
-    applications = App.objects.filter(name=app_name)
-    if len(applications) == 0:
-        application = App(name=app_name, username = username)
-        application.save()
-    else:
-        application = applications[0]
-    deploy = Deploy(status = status, app = application)
-    deploy.save()
-    deploy_id = deploy.id
+    application = App.objects.get(username=username, name=app_name)
+    dep = Deploy(status="pending", app=application)
+    dep.save()
 
-    deploy.delay(deploy_id)
-    return JsonResponse({'deploy_id': deploy_id})
+    deploy.delay(dep.id)
+    return JsonResponse({'deploy_id': dep.id})
 
 #@csrf_exempt
 def list_deploys(request, username, app_name):
