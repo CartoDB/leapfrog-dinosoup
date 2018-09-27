@@ -29,7 +29,7 @@ class Deploy(models.Model):
                 self.model.log += msg + "\n"
                 self.model.save()
 
-        self._logger = logging.Logger(f'deploy:{self.id}')
+        self._logger = logging.Logger("deploy:%s" % self.id)
         self._logger.setLevel(logging.DEBUG)
         handler = DbHandler(self)
         handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
