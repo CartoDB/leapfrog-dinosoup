@@ -8,13 +8,14 @@ class App(models.Model):
     name = models.CharField(max_length=64)
     oauth_client_id = models.CharField(max_length=64)
     oauth_client_secret = models.CharField(max_length=64)
+    repo_path = models.CharField(max_length=256)
 
 
 class Deploy(models.Model):
     app = models.ForeignKey(App, on_delete=models.CASCADE)
     status = models.CharField(max_length=30)
     log = models.TextField(default='')
-    created_at = models.DateTimeField(default=timezone.now) 
+    created_at = models.DateTimeField(default=timezone.now)
     _logger = None
 
     def logger(self):
