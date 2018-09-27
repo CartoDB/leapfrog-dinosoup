@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.dialects.postgresql import JSON
 from config import Config
+import requests
 import os
 
 app = Flask(__name__)
@@ -35,12 +36,12 @@ def hello_world():
     return 'Hello, World!'
 
 @app.route('/<username>/apps/<string:app_name>/deploy', methods=['POST'])
-def push_deploy(app_name):
+def push_deploy(username, app_name):
     status = request.form['status']
     deploy = Deploy(app_name, status)
     import pdb; pdb.set_trace()
 
 
 @app.route('/<username>/deploys/<int:deploy_id>', methods=['GET'])
-def show_deploy(deploy_id):
+def show_deploy(username, deploy_id):
     pass
