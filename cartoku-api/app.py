@@ -20,6 +20,8 @@ class App(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(), nullable=False)
     name = db.Column(db.String(), nullable=False)
+    oauth_client_id = db.Column(db.String(), nullable=False)
+    oauth_client_secret = db.Column(db.String(), nullable=False)
 
 class Deploy(db.Model):
     __tablename__ = 'deploys'
