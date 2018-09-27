@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import logging
-import sys
 import subprocess
 
 from os import path
@@ -20,8 +19,8 @@ APP_TYPES = {
 
 
 # Path stuff
-BASE_PATH = f"{path.abspath(path.dirname(__file__))}"
-DOCKERFILE = f"{path.join(path.join(BASE_PATH, 'dockerfiles'), 'Dockerfile')}"
+BASE_PATH = path.abspath(path.dirname(__file__))
+DOCKERFILE = path.join(path.join(BASE_PATH, 'dockerfiles'), 'Dockerfile')
 
 
 def clean_sting(string):
@@ -49,11 +48,13 @@ def run_command(command, logger, cwd=None):
     """
 
     logger.info(command)
+
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT, cwd=cwd)
+
     while p.poll() is None:
         line = p.stdout.readline()
-        logger.debug(line.decode('utf-8'))
+        logger.debug(line.decode('utf-8').strip())
 
     return p.returncode
 
@@ -78,31 +79,29 @@ class Deployer:
 
         # Value checks
         if version not in NODE_VERSIONS:
-            raise ValueError((f"Node version `{version}` not supported. "
-                            f"Versions: {', '.join(NODE_VERSIONS)}"))
+            raise ValueError("Node version `{}` not supported. Versions: {}".format(version, ', '.join(NODE_VERSIONS)))
 
         if manager not in NODE_MANAGERS:
-            raise ValueError((f"Node manager `{manager}` not supported. "
-                            f"Managers: {', '.join(NODE_MANAGERS)}"))
+            raise ValueError("Node manager `{}` not supported. Managers: {}".format(manager, ', '.join(NODE_MANAGERS)))
 
         # Base node command
-        node_cmd = f"docker run -it --rm -v {path}:/tmp/app -w /tmp/app node:{version}"
+        node_cmd = "docker run -it --rm -v {}:/tmp/app -w /tmp/app node:{} {}".format(path, version, manager)
 
         # Run install
         self.logger.info("Installing node dependencies")
-        rc = run_command(f"{node_cmd} {manager} install", self.logger)
+        rc = run_command("{} install".format(node_cmd), self.logger)
 
         if rc != 0:
             self.logger.error("Failed to install node dependencies")
-            raise RuntimeError(f"Error running `{manager} install`")
+            raise RuntimeError("Error running `{} install`".format(manager))
 
         # Run build
         self.logger.info("Compiling node application")
-        rc = run_command(f"{node_cmd} {manager} run build", self.logger)
+        rc = run_command("{} run build".format(node_cmd), self.logger)
 
         if rc != 0:
             self.logger.error("Failed to build node application")
-            raise RuntimeError(f"Error running `{manager} run build`")
+            raise RuntimeError("Error running `{} run build`".format(manager))
 
     def build_docker_image(self, path, app_type, app_name, version=None):
         """
@@ -125,22 +124,21 @@ class Deployer:
 
         # Value checks
         if app_type not in APP_TYPES:
-            raise ValueError((f"App type `{app_type}` not supported. "
-                              f"Types: {', '.join(APP_TYPES)}"))
+            raise ValueError("App type `{}` not supported. Types: {}".format(app_type, ', '.join(APP_TYPES)))
 
         # Build the image name
-        image_name = f"cartoku-{app_name}"
+        image_name = "cartoku-{}".format(app_name)
 
         if version:
-            image_name += f"-{version}"
+            image_name += "-{}".format(version)
 
         # Build the image
         self.logger.info("Building docker image")
-        rc = run_command(f"docker build -f {DOCKERFILE}.{app_type} -t {image_name} {path}", self.logger)
+        rc = run_command("docker build -f {}.{} -t {} {}".format(DOCKERFILE, app_type, image_name, path), self.logger)
 
         if rc != 0:
             self.logger.error("Failed to build docker image")
-            raise RuntimeError(f"Error building docker image")
+            raise RuntimeError("Error building docker image")
 
         # Return the image name
         return image_name
@@ -162,16 +160,15 @@ class Deployer:
 
         # Value checks
         if app_type not in APP_TYPES:
-            raise ValueError((f"App type `{app_type}` not supported. "
-                            f"Types: {', '.join(APP_TYPES)}"))
+            raise ValueError("App type `{}` not supported. Types: {}".format(app_type, ', '.join(APP_TYPES)))
 
         # Run the image
         env_params = ''
         for var, value in env_vars.keys():
-            env_vars += f" -e {var}='{value}'"
+            env_vars += " -e {}='{}'".format(var, value)
 
         self.logger.info("Running docker image")
-        rc = run_command(f"docker run --rm -d -p {port}:{APP_TYPES[app_type]}{env_params} {image}", self.logger)
+        rc = run_command("docker run --rm -d -p {}:{}{} {}".format(port, APP_TYPES[app_type], env_params, image), self.logger)
 
         if rc != 0:
             self.logger.error("Failed to run docker image")
@@ -187,10 +184,10 @@ if __name__ == "__main__":
 
     d = Deployer(log)
 
-    d.build_node_app(f"{path.abspath(path.dirname(__file__))}/dummy-app",
+    d.build_node_app("{}/dummy-app".format(path.abspath(path.dirname(__file__))),
                      "10", "yarn")
 
-    i = d.build_docker_image(f"{path.abspath(path.dirname(__file__))}/dummy-app",
+    i = d.build_docker_image("{}/dummy-app".format(path.abspath(path.dirname(__file__))),
                              "wsgi-python", "dummy", "1.0.0")
 
     d.run_app(i, "wsgi-python", 8080)
