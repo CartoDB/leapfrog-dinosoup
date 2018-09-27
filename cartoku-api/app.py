@@ -14,12 +14,21 @@ migrate = Migrate(app, db)
 
 ## MODELS
 
+class App(db.Model):
+    __tablename__ = 'apps'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String(), nullable=False)
+    oauth_client_id = db.Column(db.String(), nullable=False)
+    oauth_client_secret = db.Column(db.String(), nullable=False)
+
 class Deploy(db.Model):
     __tablename__ = 'deploys'
 
     id = db.Column(db.Integer, primary_key=True)
-    app = db.Column(db.String())
-    status = db.Column(db.String())
+    app_id = db.Column(db.Integer, db.ForeignKey("apps.id"), nullable=False)
+    status = db.Column(db.String(), nullable=False)
 
     def __init__(self, app, status):
         self.app = app
