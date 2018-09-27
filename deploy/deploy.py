@@ -53,7 +53,7 @@ def run_command(command, logger, cwd=None):
                          stderr=subprocess.STDOUT, cwd=cwd)
     while p.poll() is None:
         line = p.stdout.readline()
-        logger.debug(line)
+        logger.debug(line.decode('utf-8'))
 
     return p.returncode
 
