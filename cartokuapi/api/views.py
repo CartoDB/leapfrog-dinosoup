@@ -24,6 +24,18 @@ def list_deploys(request, username, app_name):
         return JsonResponse({'deploys' : serialized_deploys})
     except App.DoesNotExist:
         return JsonResponse({'deploys': []})
+
+
+def get_deploy(request, username, app_name, deploy_id):
+    try:
+        application = App.objects.get(name=app_name)
+        deploys = Deploy.objects.filter(app=application.id, id=deploy_id)
+        serialized_deploys = []
+        for deploy in deploys:
+            serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status, 'log': deploy.log})
+        return JsonResponse({'deploys' : serialized_deploys})
+    except App.DoesNotExist:
+        return JsonResponse({'deploys': []})
 #
 #@csrf_exempt
 #def show_deploy(username):
