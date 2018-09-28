@@ -122,7 +122,7 @@ def deploy_poll_url(username, app_name, deploy_id):
     return "http://%s/%s/apps/%s/deploys/%d" % (DOMAIN, username, app_name, deploy_id)
 
 def push_url(repo_path):
-    return "ssh://git@cartoku%s" % repo_path
+    return "ssh://git@%s%s" % (DOMAIN, repo_path)
 
 def deploy_instructions(repo_path):
     return [
