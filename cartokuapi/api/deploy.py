@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-import logging
 import subprocess
 
 from os import path
-from logging import StreamHandler
 
 # Supported node stuff
 NODE_VERSIONS = ['10', '8', '6']
@@ -193,4 +191,3 @@ class Deployer:
         if rc != 0:
             self.logger.error("Error reloading nginx")
             raise RuntimeError("Error reloading nginx")
-
