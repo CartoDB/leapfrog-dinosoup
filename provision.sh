@@ -2,7 +2,7 @@
 
 # Install system packages
 apt update
-apt install -y python3 python3-pip postgresql redis git nginx jq
+apt install -y python3 python3-pip postgresql redis git nginx jq nodejs npm
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
@@ -27,8 +27,11 @@ sed -i 's#ALLOWED_HOSTS = \[\]#ALLOWED_HOSTS = \["*"\]#g' cartokuapi/settings.py
 pip3 install -r requirements.txt
 python3 manage.py migrate
 
-# Setup git server
+cd /vagrant/dash || exit 1
 
+npm install
+
+# Setup git server
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
 usermod -aG docker git
@@ -41,3 +44,4 @@ systemctl reload nginx
 
 echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 manage.py runserver 0.0.0.0:8000\""
 echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 -m celery -A api worker\""
+echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"cd /vagrant/dash/; sudo -u git npm run serve --port 9000\""
