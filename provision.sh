@@ -2,7 +2,7 @@
 
 # Install system packages
 apt update
-apt install -y python3 python3-pip postgresql redis git
+apt install -y python3 python3-pip postgresql redis git nginx
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
@@ -30,7 +30,11 @@ python3 manage.py migrate
 # Setup git server
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
-sudo usermod -aG docker git
+usermod -aG docker git
+
+# Nginx
+chown git:git /etc/nginx/sites-available/
+echo "git ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/git
 
 echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 manage.py runserver 0.0.0.0:8000\""
 echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 -m celery -A api worker\""
