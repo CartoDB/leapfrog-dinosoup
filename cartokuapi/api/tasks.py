@@ -44,7 +44,7 @@ def deploy(deploy_id):
             d.save()
             magic.run_app(img, app_type, port)
 
-            d.status = "configuring nginx"
+            d.status = "configuring_nginx"
             d.save()
             magic.configure_nginx('dummy', port)
 
