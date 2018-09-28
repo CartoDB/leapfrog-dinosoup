@@ -92,16 +92,15 @@ echo "\n${blue}Deployed! Check your app at: ${green}${status_url}${no_color}\n"
         hook.write(hook_content)
         os.fchmod(hook.fileno(), 0o755)
     
-    return({'username': app.username, 'name': app.name, 'repo_path': app.repo_path})
+    return({'username': app.username, 'name': app.name, 'repo_path': app.repo_path, 'deploy_instructions' : deploy_instructions(app.repo_path)})
 
 def show_app(request, username, app_name):
     print(app_name)
     try:
         application = App.objects.get(name=app_name)
-        push_url = "ssh://git@cartoku%s" % application.repo_path
         app_data = {
                 "name": application.name,
-                "deploy_instructions" : ["git remote add cartoku %s" % push_url, "git push cartoku master"],
+                "deploy_instructions" : deploy_instructions(application.repo_path),
                 "username": application.username,
                 "status": application.status,
                 "stack": application.stack,
@@ -118,3 +117,12 @@ def app_url(username, app_name):
 
 def deploy_poll_url(username, app_name, deploy_id):
     return "http://%s:%s/%s/apps/%s/deploys/%d" % (DOMAIN, PORT, username, app_name, deploy_id)
+
+def push_url(repo_path):
+    return "ssh://git@cartoku%s" % repo_path
+
+def deploy_instructions(repo_path):
+    return [
+            "git remote add cartoku %s" % push_url(repo_path),
+            "git push cartoku master"
+            ]
