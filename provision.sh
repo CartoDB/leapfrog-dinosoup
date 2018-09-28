@@ -2,7 +2,7 @@
 
 # Install system packages
 apt update
-apt install -y python3 python3-pip postgresql redis
+apt install -y python3 python3-pip postgresql redis jq git
 
 
 # Allow local connections to postgres user without password
@@ -25,7 +25,6 @@ python3 manage.py migrate
 
 # Setup git server
 
-sudo apt-get install git
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
 
