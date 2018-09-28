@@ -21,7 +21,7 @@ def has_backend(path):
 
 
 def has_frontend(path):
-    return os.path.exists(os.path.join(path, 'static'))
+    return os.path.exists(os.path.join(path, 'package.json'))
 
 
 def check(path):
