@@ -8,6 +8,8 @@ import os
 import subprocess
 
 BASE_REPO_PATH = '/srv/git'
+DOMAIN = 'carto.ku'
+PORT = 8000
 
 def push_deploy(request, username, app_name):
     application = App.objects.get(username=username, name=app_name)
@@ -15,7 +17,7 @@ def push_deploy(request, username, app_name):
     dep.save()
 
     deploy.delay(dep.id)
-    return JsonResponse({'deploy_id': dep.id})
+    return JsonResponse({'deploy_id': dep.id, 'deploy_status_url': deploy_poll_url(username, app_name, dep.id)})
 
 def get_deploys_list (username, app_name):
     try:
@@ -72,20 +74,33 @@ def create_app(username, appname, appdesc):
 
     os.mkdir(repo_path)
     subprocess.run(['git', 'init', '--bare', repo_path])
+    hook_content = """
+#!/bin/sh
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+no_color='\033[0m'
+
+response=`curl -X POST localhost:8000/%s/apps/%s/deploy`
+status_url=`echo ${response} | jq '.deploy_status_url'`
+
+date >> /tmp/git_hook.log
+echo "\n${blue}Deployed! Check your app at: ${green}${status_url}${no_color}\n"
+""" % (app.username, app.name)
     with open(repo_path + '/hooks/post-receive', 'w') as hook:
-        hook.write("#!/bin/sh\ncurl -X POST localhost:8000/{}/apps/{}/deploy".format(app.username, app.name))
+        hook.write(hook_content)
         os.fchmod(hook.fileno(), 0o755)
     
-    return({'username': app.username, 'name': app.name, 'repo_path': app.repo_path})
+    return({'username': app.username, 'name': app.name, 'repo_path': app.repo_path, 'deploy_instructions' : deploy_instructions(app.repo_path)})
 
 def show_app(request, username, app_name):
     print(app_name)
     try:
         application = App.objects.get(name=app_name)
-        push_url = "ssh://git@cartoku%s" % application.repo_path
         app_data = {
                 "name": application.name,
-                "deploy_instructions" : ["git remote add cartoku %s" % push_url, "git push cartoku master"],
+                "deploy_instructions" : deploy_instructions(application.repo_path),
                 "username": application.username,
                 "status": application.status,
                 "stack": application.stack,
@@ -98,4 +113,16 @@ def show_app(request, username, app_name):
         return JsonResponse({})
 
 def app_url(username, app_name):
-    return "http://%s.carto.ku/%s" % (username, app_name)
+    return "http://%s.%s:%s/" % (app_name, DOMAIN, PORT)
+
+def deploy_poll_url(username, app_name, deploy_id):
+    return "http://%s:%s/%s/apps/%s/deploys/%d" % (DOMAIN, PORT, username, app_name, deploy_id)
+
+def push_url(repo_path):
+    return "ssh://git@cartoku%s" % repo_path
+
+def deploy_instructions(repo_path):
+    return [
+            "git remote add cartoku %s" % push_url(repo_path),
+            "git push cartoku master"
+            ]

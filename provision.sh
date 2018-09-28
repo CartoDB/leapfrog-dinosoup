@@ -2,7 +2,7 @@
 
 # Install system packages
 apt update
-apt install -y python3 python3-pip postgresql redis git nginx
+apt install -y python3 python3-pip postgresql redis git nginx jq
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
@@ -28,6 +28,7 @@ pip3 install -r requirements.txt
 python3 manage.py migrate
 
 # Setup git server
+
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
 usermod -aG docker git
