@@ -87,6 +87,9 @@ def show_app(request, username, app_name):
                 "name": application.name,
                 "deploy_instructions" : ["git remote add cartoku %s" % push_url, "git push cartoku master"],
                 "username": application.username,
+                "status": application.status,
+                "stack": application.stack,
+                "description": application.description,
                 "url": app_url(username, app_name),
                 "deploys_list": get_deploys_list(username, app_name)
                 }
