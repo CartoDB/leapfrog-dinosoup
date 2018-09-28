@@ -18,6 +18,7 @@ class Deploy(models.Model):
     app = models.ForeignKey(App, on_delete=models.CASCADE)
     status = models.CharField(max_length=30)
     log = models.TextField(default='')
+    commit_hash_abbreviated = models.CharField(max_length=30, default='0000000')
     created_at = models.DateTimeField(default=timezone.now)
     _logger = None
 
