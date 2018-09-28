@@ -31,6 +31,23 @@ def get_deploys_list (username, app_name):
 def list_deploys(request, username, app_name):
     return JsonResponse({'deploys' : get_deploys_list})
 
+def apps(request, username):
+    if request.method == 'POST':
+        appname = request.POST['name']
+        create_app(username, name)        
+    else:
+        return JsonResponse({'apps' : get_apps_list(username)})
+
+def get_apps_list(username):
+    try:
+        apps = App.objects.filter(username = username)
+        serialized_apps = []
+        for app in apps:
+            serialized_apps.append({'name': app.name, 'repo_path': app.repo_path, 'status': app.status, 'stack': app.stack, 'description' : app.description, 'url': app_url(username, app.name)})
+        return serialized_apps
+    except App.DoesNotExist:
+        return []
+
 def get_deploy(request, username, app_name, deploy_id):
     try:
         application = App.objects.get(name=app_name)
@@ -45,10 +62,13 @@ def get_deploy(request, username, app_name, deploy_id):
 
 def create_app(request, username):
     appname = request.POST['name']
+    appdesc = request.POST['description']
     if len(App.objects.filter(name=appname)) > 0:
         return JsonResponse({'message': "App %s already exists" % appname}, status=400)
     repo_path = BASE_REPO_PATH + "/" + username + "_" + appname + '.git'
     app = App(username=username, name=appname, repo_path=repo_path)
+    app.stack = "python"
+    app.description = appdesc
     app.save()
 
     os.mkdir(repo_path)
@@ -68,9 +88,12 @@ def show_app(request, username, app_name):
                 "name": application.name,
                 "deploy_instructions" : ["git remote add cartoku %s" % push_url, "git push cartoku master"],
                 "username": application.username,
-                "domain": "%s.carto.ku" % application.username,
+                "url": app_url(username, app_name),
                 "deploys_list": get_deploys_list(username, app_name)
                 }
         return JsonResponse(app_data)
     except App.DoesNotExist:
         return JsonResponse({})
+
+def app_url(username, app_name):
+    return "http://%s.carto.ku/%s" % (username, app_name)

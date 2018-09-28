@@ -22,7 +22,7 @@ urlpatterns = [
     path(r'<username>/apps/<app_name>/deploy', views.push_deploy),
     path(r'<username>/apps/<app_name>/deploys', views.list_deploys),
     path(r'<username>/apps/<app_name>/deploys/<deploy_id>', views.get_deploy),
-    path(r'<username>/apps', views.create_app),
+    path(r'<username>/apps', views.apps),
     path(r'<username>/apps/<app_name>', views.show_app),
 ]
     #path(r'<str:username>/deploys/<int:deploy_id>', views.show_deploy),

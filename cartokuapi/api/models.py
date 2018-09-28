@@ -6,6 +6,9 @@ import logging
 class App(models.Model):
     username = models.CharField(max_length=64)
     name = models.CharField(max_length=64)
+    status = models.CharField(max_length=64, default="blank")
+    description = models.CharField(max_length=256, default="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+    stack = models.CharField(max_length=32, default="python")
     oauth_client_id = models.CharField(max_length=64)
     oauth_client_secret = models.CharField(max_length=64)
     repo_path = models.CharField(max_length=256)
