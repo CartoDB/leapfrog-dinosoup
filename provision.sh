@@ -36,6 +36,8 @@ usermod -aG docker git
 # Nginx
 chown git:git /etc/nginx/sites-enabled/
 echo "git ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/git
+echo -e "server {\n  listen 80;\n  server_name carto.ku;\n  location / {\n    proxy_pass http://localhost:8000;\n  }\n}" > /etc/nginx/sites-enabled/_default
+systemctl reload nginx
 
 echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 manage.py runserver 0.0.0.0:8000\""
 echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 -m celery -A api worker\""
