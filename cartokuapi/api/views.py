@@ -12,8 +12,10 @@ DOMAIN = 'carto.ku'
 PORT = 8000
 
 def push_deploy(request, username, app_name):
+    commit_hash = request.POST['commit_hash']
     application = App.objects.get(username=username, name=app_name)
     dep = Deploy(status="pending", app=application)
+    dep.commit_hash_abbreviated = commit_hash
     dep.save()
 
     deploy.delay(dep.id)
@@ -25,7 +27,7 @@ def get_deploys_list (username, app_name):
         deploys = Deploy.objects.filter(app = application.id)
         serialized_deploys = []
         for deploy in deploys:
-            serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status})
+            serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status, 'commit_hash_abbreviated': deploy.commit_hash_abbreviated})
         return serialized_deploys
     except App.DoesNotExist:
         return []
@@ -57,7 +59,7 @@ def get_deploy(request, username, app_name, deploy_id):
         deploys = Deploy.objects.filter(app=application.id, id=deploy_id)
         serialized_deploys = []
         for deploy in deploys:
-            serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status, 'log': deploy.log})
+            serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status, 'log': deploy.log, 'commit_hash_abbreviated': deploy.commit_hash_abbreviated})
         return JsonResponse({'deploys' : serialized_deploys})
     except App.DoesNotExist:
         return JsonResponse({'deploys': []})
@@ -82,7 +84,8 @@ yellow='\033[0;33m'
 blue='\033[0;34m'
 no_color='\033[0m'
 
-response=`curl -X POST localhost:8000/%s/apps/%s/deploy`
+commit_hash=`git log master --format="%%h" -n 1`
+response=`curl -X POST localhost:8000/%s/apps/%s/deploy -d commit_hash=${commit_hash}`
 status_url=`echo ${response} | jq '.deploy_status_url'`
 
 date >> /tmp/git_hook.log
