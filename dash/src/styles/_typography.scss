@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:300,400,700');
+@import url('https://fonts.googleapis.com/css?family=Overpass+Mono');
+
+// -- Font families
+$font-family-display: "Montserrat", sans-serif;
+$font-family-body: "Open Sans", sans-serif;
+$font-family-mono: "Overpass Mono", sans-serif;
+
+// -- Fonts
+$font-jumbo: 72px/80px $font-family-display;
+$font-display: 40px/56px $font-family-display;
+$font-title: 24px/32px $font-family-display;
+$font-subheader: 16px/24px $font-family-body;
+$font-body: 12px/20px $font-family-body;
+$font-caption: 10px/12px $font-family-body;
