@@ -52,6 +52,7 @@ def deploy(deploy_id):
             d.logger().info("Deploy succeeded")
 
     except Exception as e:
-        d.status = "failed"
-        print(e)
-        d.logger().error(str(e))
+        if "[Errno 13] Permission denied" not in str(e):
+            d.status = "failed"
+            print(e)
+            d.logger().error(str(e))
