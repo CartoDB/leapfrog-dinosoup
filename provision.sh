@@ -34,7 +34,7 @@ sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/
 usermod -aG docker git
 
 # Nginx
-chown git:git /etc/nginx/sites-available/
+chown git:git /etc/nginx/sites-enabled/
 echo "git ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/git
 
 echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 manage.py runserver 0.0.0.0:8000\""

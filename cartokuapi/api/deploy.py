@@ -173,3 +173,24 @@ class Deployer:
         if rc != 0:
             self.logger.error("Failed to run docker image")
             raise RuntimeError("Error running app")
+
+
+    def configure_nginx(self, appname, port):
+        self.logger.info("Configuring nginx")
+        with open('/etc/nginx/sites-enabled/' + appname, 'w') as conf:
+            conf.write("""
+                server {{
+                    listen 80;
+                    server_name {appname}.carto.ku;
+
+                    location / {{
+                        proxy_pass http://localhost:{port};
+                    }}
+                }}
+            """.format(appname=appname, port=port))
+
+        rc = run_command("sudo systemctl reload nginx", self.logger)
+        if rc != 0:
+            self.logger.error("Error reloading nginx")
+            raise RuntimeError("Error reloading nginx")
+
