@@ -29,5 +29,5 @@ sudo apt-get install git
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
 
-echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"sudo -u git python3 /vagrant/cartokuapi/manage.py runserver 0.0.0.0:80\""
+echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"sudo -u git python3 /vagrant/cartokuapi/manage.py runserver 0.0.0.0:8000\""
 echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"sudo -u git python3 celery -A api worker\""
