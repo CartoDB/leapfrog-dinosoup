@@ -2,8 +2,12 @@
 
 # Install system packages
 apt update
-apt install -y python3 python3-pip postgresql redis jq git
+apt install -y python3 python3-pip postgresql redis git nginx jq
 
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
+
+apt install -y docker-ce
 
 # Allow local connections to postgres user without password
 sed -i 's#local   all             postgres                                peer#local   all             postgres                                trust#g' /etc/postgresql/10/main/pg_hba.conf
@@ -27,6 +31,11 @@ python3 manage.py migrate
 
 adduser git --home /srv/git --gecos "" --disabled-password -q
 sudo -u git mkdir /srv/git/.ssh && sudo -u git cp /vagrant/authorized_keys /srv/git/.ssh
+usermod -aG docker git
 
-echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"sudo -u git python3 /vagrant/cartokuapi/manage.py runserver 0.0.0.0:8000\""
-echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"sudo -u git python3 celery -A api worker\""
+# Nginx
+chown git:git /etc/nginx/sites-available/
+echo "git ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/git
+
+echo -e "\n\n\n\nRun the server now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 manage.py runserver 0.0.0.0:8000\""
+echo -e "\n\n\n\nRun the queues now:\nvagrant ssh -c \"cd /vagrant/cartokuapi/; sudo -u git python3 -m celery -A api worker\""
