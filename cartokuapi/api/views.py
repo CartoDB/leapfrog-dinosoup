@@ -34,7 +34,8 @@ def list_deploys(request, username, app_name):
 def apps(request, username):
     if request.method == 'POST':
         appname = request.POST['name']
-        create_app(username, name)        
+        appdesc = request.POST['description']
+        return JsonResponse(create_app(username, appname, appdesc))
     else:
         return JsonResponse({'apps' : get_apps_list(username)})
 
@@ -60,11 +61,9 @@ def get_deploy(request, username, app_name, deploy_id):
         return JsonResponse({'deploys': []})
 
 
-def create_app(request, username):
-    appname = request.POST['name']
-    appdesc = request.POST['description']
+def create_app(username, appname, appdesc):
     if len(App.objects.filter(name=appname)) > 0:
-        return JsonResponse({'message': "App %s already exists" % appname}, status=400)
+        return({'message': "App %s already exists" % appname})
     repo_path = BASE_REPO_PATH + "/" + username + "_" + appname + '.git'
     app = App(username=username, name=appname, repo_path=repo_path)
     app.stack = "python"
@@ -76,8 +75,8 @@ def create_app(request, username):
     with open(repo_path + '/hooks/post-receive', 'w') as hook:
         hook.write("#!/bin/sh\ncurl -X POST localhost:8000/{}/apps/{}/deploy".format(app.username, app.name))
         os.fchmod(hook.fileno(), 0o755)
-
-    return JsonResponse({'username': app.username, 'name': app.name, 'repo_path': app.repo_path})
+    
+    return({'username': app.username, 'name': app.name, 'repo_path': app.repo_path})
 
 def show_app(request, username, app_name):
     print(app_name)
