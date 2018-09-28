@@ -24,7 +24,7 @@ def push_deploy(request, username, app_name):
 def get_deploys_list (username, app_name):
     try:
         application = App.objects.get(name=app_name)
-        deploys = Deploy.objects.filter(app = application.id)
+        deploys = Deploy.objects.filter(app = application.id).order_by('-created_at')
         serialized_deploys = []
         for deploy in deploys:
             serialized_deploys.append({'created_at': deploy.created_at, 'status': deploy.status, 'commit_hash_abbreviated': deploy.commit_hash_abbreviated})
@@ -33,7 +33,14 @@ def get_deploys_list (username, app_name):
         return []
 
 def list_deploys(request, username, app_name):
-    return JsonResponse({'deploys' : get_deploys_list})
+    return JsonResponse({'deploys' : get_deploys_list(username, app_name)})
+
+def get_last_deploy(username, app_name):
+    deploys = get_deploys_list(username, app_name)
+    if len(deploys) > 0:
+        return deploys[0]
+    else:
+        return {}
 
 def apps(request, username):
     if request.method == 'POST':
@@ -48,7 +55,7 @@ def get_apps_list(username):
         apps = App.objects.filter(username = username)
         serialized_apps = []
         for app in apps:
-            serialized_apps.append({'name': app.name, 'repo_path': app.repo_path, 'status': app.status, 'stack': app.stack, 'description' : app.description, 'url': app_url(username, app.name)})
+            serialized_apps.append({'name': app.name, 'repo_path': app.repo_path, 'status': app.status, 'stack': app.stack, 'description' : app.description, 'url': app_url(username, app.name), 'last_deploy': get_last_deploy(username, app.name)})
         return serialized_apps
     except App.DoesNotExist:
         return []
