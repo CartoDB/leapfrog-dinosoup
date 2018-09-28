@@ -116,10 +116,10 @@ def show_app(request, username, app_name):
         return JsonResponse({})
 
 def app_url(username, app_name):
-    return "http://%s.%s:%s/" % (app_name, DOMAIN, PORT)
+    return "http://%s.%s/" % (app_name, DOMAIN)
 
 def deploy_poll_url(username, app_name, deploy_id):
-    return "http://%s:%s/%s/apps/%s/deploys/%d" % (DOMAIN, PORT, username, app_name, deploy_id)
+    return "http://%s/%s/apps/%s/deploys/%d" % (DOMAIN, username, app_name, deploy_id)
 
 def push_url(repo_path):
     return "ssh://git@cartoku%s" % repo_path
