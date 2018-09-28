@@ -39,9 +39,14 @@ def deploy(deploy_id):
             d.save()
             img = magic.build_docker_image(tmp, app_type, d.app.name, version=d.pk)
 
+            port = 8000 + d.pk
             d.status = "executing"
             d.save()
-            magic.run_app(img, app_type, 8000 + d.pk)
+            magic.run_app(img, app_type, port)
+
+            d.status = "configuring nginx"
+            d.save()
+            magic.configure_nginx('dummy', port)
 
             d.status = "success"
             d.logger().info("Deploy succeeded")
